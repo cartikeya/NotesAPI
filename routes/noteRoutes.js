@@ -47,6 +47,24 @@ router.delete("/notes/:id", authMiddleware, async (req, res) => {
   }
 });
 
-
+router.put("/notes/:id", authMiddleware, async (req, res) => {
+  try {
+    const note = await Note.findOne({
+      _id: req.params.id,
+      user: req.user.userId,
+    });
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+    ((note.title = req.body.title),
+      (note.content = req.body.content),
+      await note.save());
+    res.json({
+      message: "Note updated successfully",
+    });
+  } catch (error) {
+    res.status(500).send("Internal server error");
+  }
+});
 
 module.exports = router;

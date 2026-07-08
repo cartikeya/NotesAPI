@@ -22,18 +22,6 @@ app.get("/", (req, res) => {
 });
 
 
-app.delete("/notes/:id", async (req, res) => {
-  const notesId = req.params.id;
-  const objectId = new ObjectId(notesId);
-  const result = await Notes.deleteOne({ _id: objectId });
-  if (result.deletedCount == 0) {
-    return res.status(404).json({
-      message: "Note Not found",
-    });
-  }
-  res.json({ message: "Note deleted successfully" });
-});
-
 app.put("/notes/:id", async (req, res) => {
   const notesId = req.params.id;
   const objectId = new ObjectId(notesId);
