@@ -1,4 +1,4 @@
-const { User } = require("../models/Note");
+const { User } = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../middleware/authMiddleware");
@@ -16,7 +16,8 @@ const register = async (req, res) => {
     console.log(user);
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    res.status(500).send("Internal server error");
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 };
 

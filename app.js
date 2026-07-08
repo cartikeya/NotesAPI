@@ -21,10 +21,6 @@ app.get("/", (req, res) => {
   res.send("Notes API running");
 });
 
-app.get("/notes", async (req, res) => {
-  const notes = await Notes.find();
-  res.json(notes);
-});
 
 app.delete("/notes/:id", async (req, res) => {
   const notesId = req.params.id;
