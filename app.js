@@ -21,23 +21,4 @@ app.get("/", (req, res) => {
   res.send("Notes API running");
 });
 
-
-app.put("/notes/:id", async (req, res) => {
-  const notesId = req.params.id;
-  const objectId = new ObjectId(notesId);
-
-  const result = await Notes.updateOne(
-    { _id: objectId },
-    {
-      $set: {
-        text: req.body.text,
-      },
-    },
-  );
-  if (result.matchedCount === 0) {
-    return res.status(404).json({ message: "Note not found" });
-  }
-  res.json({ message: "note updated successfully", result });
-});
-
 app.listen(PORT, () => console.log(`server running on localhost:${PORT}`));
