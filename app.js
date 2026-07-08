@@ -1,52 +1,35 @@
-const { MongoClient, ObjectId } = require("mongodb");
+// const { MongoClient, ObjectId } = require("mongodb");
+const mongoose = require("mongoose");
 const express = require("express");
-const fs = require("fs");
+const bcrypt = require("bcrypt");
 const app = express();
 const PORT = 3000;
-
-let notesCollection;
 app.use(express.json());
-async function startServer() {
-  const client = new MongoClient("mongodb://localhost:27017");
+require("dotenv").config();
+const authRoutes = require("./routes/authRoutes");
+const noteRoutes = require("./routes/noteRoutes");
 
-  await client.connect();
-  console.log("Connected to MongoDB!");
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MONGODB connected"))
+  .catch((err) => console.log(err));
 
-  const db = client.db("Notes");
-
-  notesCollection = db.collection("notes");
-
-  app.listen(PORT, () => console.log(`Server running on localhost:${PORT}`));
-}
-
-startServer();
+app.use("/", authRoutes);
+app.use("/", noteRoutes);
 
 app.get("/", (req, res) => {
   res.send("Notes API running");
 });
-app.get("/notes", async (req, res) => {
-  const notes = await notesCollection.find().toArray();
-  res.json(notes);
-});
 
-app.post("/notes", async (req, res) => {
-  const newNote = { text: req.body.text };
-  if (!req.body.text) {
-    return res.status(400).json({
-      message: "text is required",
-    });
-  }
-  await notesCollection.insertOne(newNote);
-  res.json({
-    message: "Note added succesfull",
-    note: newNote,
-  });
+app.get("/notes", async (req, res) => {
+  const notes = await Notes.find();
+  res.json(notes);
 });
 
 app.delete("/notes/:id", async (req, res) => {
   const notesId = req.params.id;
   const objectId = new ObjectId(notesId);
-  const result = await notesCollection.deleteOne({ _id: objectId });
+  const result = await Notes.deleteOne({ _id: objectId });
   if (result.deletedCount == 0) {
     return res.status(404).json({
       message: "Note Not found",
@@ -59,7 +42,7 @@ app.put("/notes/:id", async (req, res) => {
   const notesId = req.params.id;
   const objectId = new ObjectId(notesId);
 
-  const result = await notesCollection.updateOne(
+  const result = await Notes.updateOne(
     { _id: objectId },
     {
       $set: {
@@ -73,4 +56,4 @@ app.put("/notes/:id", async (req, res) => {
   res.json({ message: "note updated successfully", result });
 });
 
-// app.listen(PORT, () => console.log(`server running on localhost:${PORT}`));
+app.listen(PORT, () => console.log(`server running on localhost:${PORT}`));
